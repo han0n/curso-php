@@ -1,6 +1,11 @@
-<?php
+<?php 
     $firstName = "Antonio"; 
     $lastName = "Varela";
+    //require './inc/cabecera.php';
+    include './inc/cabecera.php';
+    include './inc/barra-menu.php';
+    include './inc/contenido.php';
+    include './inc/footer.php';
 ?>
 <!DOCTYPE html>
 <html>
@@ -34,30 +39,11 @@
     <link rel="stylesheet" href="" >
 </head>
 <body>
-    <header>
-        <h1>Ejemplo de cabecera</h1>
-        <h1> Bienvenido, <?= $firstName, " ", $lastName ?> </h1>
-    </header>
 
-    <nav class="vertical-menu">
-        <ul>
-            <li><a href="#" >Entrada1</a></li>
-            <li><a href="#" >Entrada2</a></li>
-        </ul>
-        
-    </nav>
+    
 
-    <div class="contenido">
-        <p>Aqui vendria el contenido de la web.</p> 
-        <p>Aqui vendria el contenido de la web.</p> 
-        <p>Aqui vendria el contenido de la web.</p> 
-        <p>Aqui vendria el contenido de la web.</p> 
-        <p>Aqui vendria el contenido de la web.</p> 
-        <p>Aqui vendria el contenido de la web.</p> 
-    </div>
+    
 
-    <footer>
-        <p>Ejemplo de footer</p>
-    </footer>
+    
 </body>
 </html>
