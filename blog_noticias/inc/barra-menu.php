@@ -1,7 +1,14 @@
+<?php
+    $categorias = getAllCategorias(conectarBD(), []);
+?>
 <nav id="vertical-menu">
-    <ul>
-        <li><a href="#" >Calendario</a></li>
-        <li><a href="#" >Noticias</a></li>
+    <ul><?php
+        foreach($categorias as $categoria){ ?>
+            <li>
+                <a href="index.php?categoria=<?= $categoria["id"]?>" > 
+                <?= $categoria["nombre"]?> </a>
+            </li> <?php
+        }?>
     </ul>
         
 </nav>

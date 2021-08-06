@@ -8,7 +8,7 @@ body{ background-image: url(https://i.pinimg.com/originals/a2/f1/49/a2f14920902a
 #vertical-menu {
     float: right;
     width: 20%;
-    padding-top: 25px;
+    padding-top: 45px;
 }
 
 #vertical-menu li{ padding:5px; text-align: center; padding-bottom: 10px;}
@@ -29,9 +29,10 @@ div{margin-left:25vw; margin-right: 25vw;}
 
 .sin-margen{ margin-left:0; margin-right: 0;}
 
-.contenido { margin-bottom: 10px; padding: 5px 0px 5px 30px; padding-bottom: 20px;}
+.contenido { margin-bottom: 10px; padding: 35px 0px 45px 30px; }
 .contenido:hover{transform: scaleX(105%) scaleY(105%); transition: 0.9s;}
 .contenido .cuerpo-noticia p { font-size: 1.0rem; line-height: 1.4rem; padding-bottom: 10px; text-align: justify; }
+.cuerpo-noticia{font-family: 'Droid serif'; color: #333; padding-bottom: 2.5px; font-size: 1.1rem; text-align: justify;}
 .contenido footer { background-color:#f9f7f4; font-style: italic; padding: 0px;  width: fit-content; float: right; border-bottom: 1px solid #2f2f2f; }
 .contenido footer p{color: black;}
 
@@ -64,4 +65,11 @@ div{margin-left:25vw; margin-right: 25vw;}
 
 
 footer{ background-color: #333; padding: 25px; text-align: right; opacity: 0.94;}
-footer p{color: #f9f7f4;}
+footer p{color: #f9f7f4; padding-top: 15px;}
+
+.paginador { padding: 25px 5px; text-align: center;  }
+.paginador a { margin: 0 4px; }
+
+.boton { position:relative; color: #f9f7f1; font-size: 1.1rem; display: inline-block; width: auto; height: auto; padding: 5px 10px; text-decoration:none; font-weight: bold; cursor: pointer;  background-color: #2f2f2f; box-shadow: 1px 1px 3px 0px #333; }
+.boton:hover { transform: scaleX(90%) scaleY(90%); box-shadow: 1px 1px 3px 0px #f9f7f1 ;transition: 1.0s ; }
+.boton:active { top:1px; left:1px; }

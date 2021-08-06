@@ -3,12 +3,15 @@
      if(session_status() === PHP_SESSION_NONE) {
         session_start(); //$_SESSION
     }
-    /*
-    $firstName = "Antonio"; 
-    $lastName = "Varela";
-    */
+    
     //Dependencia del controlador
     require_once 'utils/functions.php';
+    //Incluimos todas las dependencias del controlador
+    require_once "config.php";
+    require_once "repo/conector.php";
+    require_once "repo/usuario-cntlr.php";
+    require_once "repo/noticias-cntlr.php";
+    require_once "repo/categorias-cntlr.php";
 
     $username = $_SESSION["usuario"] ?? "";
 
@@ -21,10 +24,20 @@
                 $user = $_POST["usuario"] ?? "";
                 $clave = $_POST["pswd"] ?? "";
 
-                $_SESSION["usuario"] = $user;
+                //Comprobamos que esté en la BBDD
+                if(compruebaLogin(conectarBD(), $user, $clave)) {
+                    $_SESSION["usuario"] = $user;
+                    header("Location: index.php?p=inicio"); //Redirigimos a la portada
+                    exit();
+                }
 
-                header("Location: index.php?p=inicio"); //Redirigimos a la portada
-                exit(); 
+                header("Location: index.php?p=login&errorCode=3");
+                exit();
+            } else {
+                $errorCode = $_GET["errorCode"] ?? "";
+
+                if($errorCode==3) { $msgErrors = "Los datos introducidos de usuario/clave son incorrectos. "; } 
+                else { $msgErrors = "No se ha recibido formulario."; }
             }
             break;
         case "logout":
@@ -41,13 +54,25 @@
             break;
         case "inicio":
             $cabecera="Noticias";
-            $noticias = array(
-                array("titulo" => "Título noticia 1", "autor" => "Pedro Picapiedra", "fecha" => "12/05/21", "cuerpo" => "<p> Lorem ipsum dolor sit amet consectetur adipisicing elit. At debitis sapiente perspiciatis quae, est assumenda eum accusantium commodi, enim alias reprehenderit maxime ullam! Hic, quis sunt qui excepturi possimus, exercitationem cupiditate perferendis illum dolorem quidem ducimus, error esse assumenda. Enim debitis aliquam officia porro laborum fuga veritatis doloribus quibusdam maxime sapiente? Accusantium numquam dolorum dolore minima, quisquam facere quidem ex sint. Debitis a doloremque obcaecati, aliquid sit qui natus cupiditate? Voluptas, temporibus incidunt minus quibusdam dignissimos praesentium esse eum. Ipsum tempora itaque sequi perferendis iste! Voluptates ab pariatur officiis commodi veritatis id enim autem vero ut, dolorem, reprehenderit provident. </p>"),
-                array("titulo" => "Título noticia 2", "autor" => "Charles Chaplin", "fecha" => "12/07/21", "cuerpo" => "<p> Lorem ipsum, dolor sit amet consectetur adipisicing elit. Beatae consequatur dignissimos accusantium, ea alias ad pariatur nobis aliquid, quas esse inventore minima nam quaerat eligendi tempora? Iure, repellendus aliquid! </p>"),
-                array("titulo" => "Título noticia 3", "autor" => "Rick Sánchez", "fecha" => "18/07/21", "cuerpo" => "<p> LLorem ipsum dolor sit amet consectetur adipisicing elit. Magnam exercitationem repellendus, vero harum corrupti minima animi porro, cum perspiciatis natus delectus aut quos molestias. Perspiciatis voluptatibus quo nisi amet quia, necessitatibus, architecto assumenda sunt vel facere odio quisquam. Sunt repellat tempora perspiciatis in nisi possimus suscipit esse. A eveniet necessitatibus cumque modi iste dicta fugiat! Blanditiis eum quos itaque veritatis labore eveniet minus! Eveniet! </p>"),
-                array("titulo" => "Título noticia 4", "autor" => "Isaac Asimov", "fecha" => "19/07/21", "cuerpo" => "<p> Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aspernatur harum exercitationem ad officiis sunt doloribus optio eum reiciendis illum nostrum ducimus impedit, aliquam quidem minima facere quasi a perspiciatis odio, odit ex. Asperiores enim deleniti voluptate doloremque. </p>"), 
+            //$noticias = getAllNoticias(conectarBD(), []);
+
+            $filtro = [];
+            //obtengo el filtro, si no hay categoria selec. muestra 5 noticias
+            $idCat = $_GET["categoria"] ?? "";
+
+            if($idCat!="") {
+                $filtro["idCategoria"] = $idCat;
+                $totalRegistros = getCountNoticiasPorCategoria(conectarBD(), [], $idCat);
+                $nTotalPaginas = ceil($totalRegistros/5);
+                
+            }else{//Si no hay categoria, cuenta el paginado sobre las noticias totales
+                $totalRegistros = getCountNoticias(conectarBD());
+                $nTotalPaginas = ceil($totalRegistros/5);
+            }
             
-            );
+            $numPagina = $_GET["noticias"] ?? 1;
+            $noticias = getNoticiasByField(conectarBD(), $filtro, $numPagina);
+            
             break;
         default:
             break;
@@ -75,18 +100,32 @@
     <?php 
     switch($pageParam){
         case "inicio":
+            //Salida de cuando se conectó el usuario admin:
+            if(getUsername() != "admin"){ echo "Última conexión de admin: ". getUltimaConexion(conectarBD(), "admin");}
 
-            include './inc/barra-menu.php' ?>
+            include './inc/barra-menu.php'; ?>
             <main id="noticias"> 
                 <section> 
                     <?php 
                         foreach($noticias as $noticia){
                             include './inc/contenido.php'; 
                         }
-                    ?> 
+                    ?>
                 </section>
+                <div class="paginador sin-margen"> <!--paginación-->
+                    <?php 
+                        if($nTotalPaginas!=0){?>
+                            <p > <?php 
+                                for($i=1;$i<=$nTotalPaginas;$i++) { ?>
+                                    <a class="boton" href="index.php?noticias=<?=$i?>"><?=$i?></a> <?php 
+                            } ?>
+                            </p><?php
+                        }//Falta hacer que pagine si es categoria
+                    ?> 
+                </div>
             </main>
             <div style="clear:both"></div> <?php 
+            
             break;
         case "contacto": ?>
         
@@ -121,6 +160,19 @@
 
                 </section>
             </main> <?php
+            break;
+        case "login": //Si no se han introducido bien los datos ?>
+
+            <main id="formulario"> 
+                <section class="btnSubida">  <?php 
+                        
+                        echo "$msgErrors"; 
+                     ?>
+                    
+
+                </section>
+            </main> <?php
+            break;
         default:
             break;
     }?>
