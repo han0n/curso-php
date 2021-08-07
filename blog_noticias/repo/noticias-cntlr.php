@@ -79,3 +79,29 @@
     
         return $stmt->fetchColumn();
     }
+
+    function getNoticiasByPage($con, int $nPage=1, int $nResultados=5):array {
+    
+        $sql = "SELECT * FROM noticias ";
+        
+        if($nPage>0) {
+            $offset = ($nPage-1)*$nResultados;
+            $sql.= " LIMIT $offset,$nResultados";
+        }
+    
+        $stmt = $con->prepare($sql);
+        $stmt->execute();
+    
+        $stmt->setFetchMode(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll();
+    }
+
+    
+
+    function saveNoticia($con, $campos, $id){
+        if($id==null || $id==0) {
+            return insert($con, "noticias", $campos);
+        } else {
+            return update($con, "noticias", $campos, $id);
+        }
+    }

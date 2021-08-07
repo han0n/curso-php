@@ -17,6 +17,7 @@
 
     $pageParam = (array_key_exists("p", $_GET) ? $_GET["p"] : "inicio");
     $page = "pages/$pageParam.php";
+    $esCategoria=false;
 
     switch($pageParam){
         case "login":
@@ -64,6 +65,7 @@
                 $filtro["idCategoria"] = $idCat;
                 $totalRegistros = getCountNoticiasPorCategoria(conectarBD(), [], $idCat);
                 $nTotalPaginas = ceil($totalRegistros/5);
+                $esCategoria=true;//Se usa más abajo para que redireccione a la pag según noticias o categoria
                 
             }else{//Si no hay categoria, cuenta el paginado sobre las noticias totales
                 $totalRegistros = getCountNoticias(conectarBD());
@@ -73,6 +75,68 @@
             $numPagina = $_GET["noticias"] ?? 1;
             $noticias = getNoticiasByField(conectarBD(), $filtro, $numPagina);
             
+            break;
+        case "categorias":
+            //$categorias = getAllCategorias(conectarBD(), []);
+            $totalCategorias = getCountCategorias(conectarBD(), []);
+            $nTotalPaginas = ceil($totalCategorias/5);
+    
+            $accion = $_GET["accion"] ?? "listar";
+            $id = $_GET["id"] ?? 0;
+            $nPage = $_GET["page"] ?? 1;
+            $categorias = getCategoriasByPage(conectarBD(), $nPage);
+    
+            $modoEdicion = false;
+    
+            if($accion=="eliminar") {
+                delById(conectarBD(), "categorias",$id);
+    
+                header("Location: index.php?p=categorias");
+                exit();
+            } else if($accion=="editar") {
+                $modoEdicion = true;
+                //$id == 0 --> creamos  $id!=0 --> actualizamos
+                $categoria = null;
+                if($id!=0) {
+                    $categoria = getById(conectarBD(), "categorias", $id);
+                }
+                if($categoria == null) {
+                    $ccategoria = ["nombre"=>""];
+                }
+    
+                
+            }
+            break;
+        case "noticias":
+            //$categorias = getAllCategorias(conectarBD(), []);
+            $totalNoticias = getCountNoticias(conectarBD(), []);
+            $nTotalPaginas = ceil($totalNoticias/5);
+    
+            $accion = $_GET["accion"] ?? "listar";
+            $id = $_GET["id"] ?? 0;
+            $nPage = $_GET["page"] ?? 1;
+            $noticias = getNoticiasByPage(conectarBD(), $nPage);
+    
+            $modoEdicion = false;
+    
+            if($accion=="eliminar") {
+                delById(conectarBD(), "noticias",$id);
+    
+                header("Location: index.php?p=noticias");
+                exit();
+            } else if($accion=="editar") {
+                $modoEdicion = true;
+                //$id == 0 --> creamos  $id!=0 --> actualizamos
+                $noticia = null;
+                if($id!=0) {
+                    $noticia = getById(conectarBD(), "noticias", $id);
+                }
+                if($noticia == null) {
+                    $noticia = ["titulo"=>"", "contenido" => "", "idCategoria" => 0, "autor" => getUsername()];
+                }
+    
+                
+            }
             break;
         default:
             break;
@@ -116,11 +180,15 @@
                     <?php 
                         if($nTotalPaginas!=0){?>
                             <p > <?php 
-                                for($i=1;$i<=$nTotalPaginas;$i++) { ?>
-                                    <a class="boton" href="index.php?noticias=<?=$i?>"><?=$i?></a> <?php 
+                                for($i=1;$i<=$nTotalPaginas;$i++) { 
+                                    if(!$esCategoria){ ?>
+                                        <a class="boton" href="index.php?noticias=<?=$i?>"><?=$i?></a> <?php 
+                                    }else{ ?>
+                                        <a class="boton" href="index.php?categoria=<?=$idCat?>&page=<?=$i?>"><?=$i?></a> <?php 
+                                    }
                             } ?>
                             </p><?php
-                        }//Falta hacer que pagine si es categoria
+                        }//HECHO: Falta hacer que pagine si es categoria
                     ?> 
                 </div>
             </main>
@@ -170,6 +238,58 @@
                      ?>
                     
 
+                </section>
+            </main> <?php
+            break;
+        case "categorias": ?>
+            <main id="formulario"> 
+                <section> 
+                    <?php 
+                            
+                            if(!array_key_exists("btnCategorias", $_POST)) {
+                                include 'pages/categorias.php';
+                                
+                            } else{
+                                
+                                //.... obtener valores de post
+                                $nombre = $_POST["nombre"] ?? "Sin Categoria";
+                                if(saveCategoria(conectarBD(), ["nombre" => $nombre], $id)) {
+                                    header("Location: index.php?p=categorias");
+                                   
+                                }
+                            }
+                        
+                    ?>
+                </section>
+            </main> <?php
+            break;
+        case "noticias": ?>
+            <main id="formulario"> 
+                <section> 
+                    <?php 
+                            
+                            if(!array_key_exists("btnNoticias", $_POST)) {
+                                $categorias = getAllCategorias(conectarBD(), []);//Para el selector
+                                include 'pages/noticias.php';
+                                
+                            } else{
+                                
+                                //.... obtener valores de post
+                                $titulo = $_POST["titulo"] ?? "Sin Título";
+                                $contenido = $_POST["contenido"] ?? "Sin Contenido";
+                                $categoria = $_POST["cat"] ?? "Sin Categoría";
+                                // Se almacenan en un array como clave => valor para su tratamiento en el save
+                                $valores = ["titulo" => $titulo, 
+                                                "contenido" => $contenido, 
+                                                "idCategoria" => $categoria, 
+                                                "autor" => strval(getUsername())];
+                                if(saveNoticia(conectarBD(), $valores, $id)) {
+                                    header("Location: index.php?p=noticias");
+                                    
+                                }
+                            }
+                        
+                    ?>
                 </section>
             </main> <?php
             break;

@@ -56,9 +56,11 @@ div{margin-left:25vw; margin-right: 25vw;}
 #formulario p { padding-bottom: 5px; }
 #formulario label { display: inline-block; width: 100px; padding-top: 5px; vertical-align: top; }
 #formulario input { padding: 2px 4px; width: calc(100% - 130px); line-height: 22px; height: 22px; }
+#formulario select { padding: 2px 4px; line-height: 30px; height: 30px; }
 #formulario textarea { padding: 2px 4px; width: calc(100% - 128px); line-height: 22px; height: 150px; resize:none;}
 #formulario .btnGuardar {float: right; padding-inline-end: 14px;}
 #formulario .btnGuardar input{ text-align: start;  width: min-content;}
+
 
 #formulario .btnSubida { text-align: center; font-family: 'Droid serif'; font-size: 0.95rem;}
 #formulario .btnSubida input{ width: min-content;}
@@ -70,6 +72,13 @@ footer p{color: #f9f7f4; padding-top: 15px;}
 .paginador { padding: 25px 5px; text-align: center;  }
 .paginador a { margin: 0 4px; }
 
-.boton { position:relative; color: #f9f7f1; font-size: 1.1rem; display: inline-block; width: auto; height: auto; padding: 5px 10px; text-decoration:none; font-weight: bold; cursor: pointer;  background-color: #2f2f2f; box-shadow: 1px 1px 3px 0px #333; }
-.boton:hover { transform: scaleX(90%) scaleY(90%); box-shadow: 1px 1px 3px 0px #f9f7f1 ;transition: 1.0s ; }
+.boton { position:relative; color: #f9f7f1; font-size: 1.1rem; display: inline-block; width: auto; height: auto; padding: 5px 10px; text-decoration:none; font-weight: bold; cursor: pointer;  background-color: #2f2f2f; opacity: 0.94; ;box-shadow: 1px 2px 0px 0px #999 ;}
+.boton:hover { transform: translateX(1px) translateY(1px);box-shadow: 0px 0px 0px 0px #999 ;transition: 0.15s ; }
 .boton:active { top:1px; left:1px; }
+
+
+.tblListado { width: 100%; margin: 10px auto; border-collapse: collapse; }
+.tblListado th { padding:5px 10px; font-weight: bold; color:#fff; border: 1px solid #666; background-color: #333;}
+.tblListado td { padding:5px 10px; border: 1px solid #666; }
+.tblListado .id { width: 40px; text-align: right; }
+.tblListado .acciones { width: 240px; text-align: center; }
