@@ -10,8 +10,8 @@
     require_once "config.php";
     require_once "repo/Conector.php";
     require_once "repo/UsuarioRepo.php";
-    require_once "repo/NoticiasRepo.php";
-    require_once "repo/CategoriasRepo.php";
+    require_once "repo/NoticiaRepo.php";
+    require_once "repo/CategoriaRepo.php";
 
     $username = $_SESSION["usuario"] ?? "";
 
