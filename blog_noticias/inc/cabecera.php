@@ -1,6 +1,7 @@
 <div>
     <header>
         <?php 
+            include "info-pruebas.php"; //Salida para los echos de __String() de cada objeto
             if(!isUserLogged()){
                 include "cuadro-login.php";
             }

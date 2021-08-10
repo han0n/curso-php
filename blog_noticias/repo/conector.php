@@ -1,5 +1,12 @@
 <?php
 
+class Conector{
+    private $conexion;
+
+    public function __construct(){
+        $this->conectarBD();
+    }
+
     function conectarBD() {
         try {
             $conexion = new PDO(DB_DSN, DB_USER, DB_PASS);

@@ -1,5 +1,5 @@
 <?php
-    $categorias = getAllCategorias(conectarBD(), []);
+    $categorias = $categoriasRepo->getAllCategorias([]);
 ?>
 <nav id="vertical-menu">
     <ul><?php

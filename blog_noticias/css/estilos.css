@@ -82,3 +82,5 @@ footer p{color: #f9f7f4; padding-top: 15px;}
 .tblListado td { padding:5px 10px; border: 1px solid #666; }
 .tblListado .id { width: 40px; text-align: right; }
 .tblListado .acciones { width: 240px; text-align: center; }
+
+.info{float:left; text-align: left; padding: 15px;}

@@ -8,16 +8,21 @@
     require_once 'utils/functions.php';
     //Incluimos todas las dependencias del controlador
     require_once "config.php";
-    require_once "repo/conector.php";
-    require_once "repo/usuario-cntlr.php";
-    require_once "repo/noticias-cntlr.php";
-    require_once "repo/categorias-cntlr.php";
+    require_once "repo/Conector.php";
+    require_once "repo/UsuarioRepo.php";
+    require_once "repo/NoticiasRepo.php";
+    require_once "repo/CategoriasRepo.php";
 
     $username = $_SESSION["usuario"] ?? "";
 
     $pageParam = (array_key_exists("p", $_GET) ? $_GET["p"] : "inicio");
     $page = "pages/$pageParam.php";
     $esCategoria=false;
+
+    $conector = new Conector();
+    $categoriasRepo = new CategoriaRepo($conector);
+    $noticiasRepo = new NoticiaRepo($conector);
+    $usuariosRepo = new UsuarioRepo($conector);
 
     switch($pageParam){
         case "login":
@@ -26,7 +31,7 @@
                 $clave = $_POST["pswd"] ?? "";
 
                 //Comprobamos que esté en la BBDD
-                if(compruebaLogin(conectarBD(), $user, $clave)) {
+                if($usuariosRepo->compruebaLogin($user, $clave)) {
                     $_SESSION["usuario"] = $user;
                     header("Location: index.php?p=inicio"); //Redirigimos a la portada
                     exit();
@@ -63,33 +68,33 @@
 
             if($idCat!="") {
                 $filtro["idCategoria"] = $idCat;
-                $totalRegistros = getCountNoticiasPorCategoria(conectarBD(), [], $idCat);
+                $totalRegistros = $noticiasRepo->getCountNoticiasPorCategoria([], $idCat);
                 $nTotalPaginas = ceil($totalRegistros/5);
                 $esCategoria=true;//Se usa más abajo para que redireccione a la pag según noticias o categoria
                 
             }else{//Si no hay categoria, cuenta el paginado sobre las noticias totales
-                $totalRegistros = getCountNoticias(conectarBD());
+                $totalRegistros = $noticiasRepo->getCountNoticias();
                 $nTotalPaginas = ceil($totalRegistros/5);
             }
             
             $numPagina = $_GET["noticias"] ?? 1;
-            $noticias = getNoticiasByField(conectarBD(), $filtro, $numPagina);
+            $noticias = $noticiasRepo->getNoticiasByField($filtro, $numPagina);
             
             break;
         case "categorias":
             //$categorias = getAllCategorias(conectarBD(), []);
-            $totalCategorias = getCountCategorias(conectarBD(), []);
+            $totalCategorias = $categoriasRepo->getCountCategorias([]);
             $nTotalPaginas = ceil($totalCategorias/5);
     
             $accion = $_GET["accion"] ?? "listar";
             $id = $_GET["id"] ?? 0;
             $nPage = $_GET["page"] ?? 1;
-            $categorias = getCategoriasByPage(conectarBD(), $nPage);
+            $categorias = $categoriasRepo->getCategoriasByPage($nPage);
     
             $modoEdicion = false;
     
             if($accion=="eliminar") {
-                delById(conectarBD(), "categorias",$id);
+                $categoriasRepo->delById($id);
     
                 header("Location: index.php?p=categorias");
                 exit();
@@ -98,10 +103,10 @@
                 //$id == 0 --> creamos  $id!=0 --> actualizamos
                 $categoria = null;
                 if($id!=0) {
-                    $categoria = getById(conectarBD(), "categorias", $id);
+                    $categoria = $categoriasRepo->getById($id);
                 }
                 if($categoria == null) {
-                    $ccategoria = ["nombre"=>""];
+                    $categoria = ["nombre"=>""];
                 }
     
                 
@@ -109,18 +114,18 @@
             break;
         case "noticias":
             //$categorias = getAllCategorias(conectarBD(), []);
-            $totalNoticias = getCountNoticias(conectarBD(), []);
+            $totalNoticias = $noticiasRepo->getCountNoticias( [] );
             $nTotalPaginas = ceil($totalNoticias/5);
     
             $accion = $_GET["accion"] ?? "listar";
             $id = $_GET["id"] ?? 0;
             $nPage = $_GET["page"] ?? 1;
-            $noticias = getNoticiasByPage(conectarBD(), $nPage);
+            $noticias = $noticiasRepo->getNoticiasByPage($nPage);
     
             $modoEdicion = false;
     
             if($accion=="eliminar") {
-                delById(conectarBD(), "noticias",$id);
+                $noticiasRepo->delById($id);
     
                 header("Location: index.php?p=noticias");
                 exit();
@@ -129,7 +134,7 @@
                 //$id == 0 --> creamos  $id!=0 --> actualizamos
                 $noticia = null;
                 if($id!=0) {
-                    $noticia = getById(conectarBD(), "noticias", $id);
+                    $noticia = $noticiasRepo->getById($id);
                 }
                 if($noticia == null) {
                     $noticia = ["titulo"=>"", "contenido" => "", "idCategoria" => 0, "autor" => getUsername()];
@@ -142,7 +147,7 @@
             break;
     }
 
-    
+    $conector = null; //Se destruye el objeto que da la conexión
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -164,8 +169,6 @@
     <?php 
     switch($pageParam){
         case "inicio":
-            //Salida de cuando se conectó el usuario admin:
-            if(getUsername() != "admin"){ echo "Última conexión de admin: ". getUltimaConexion(conectarBD(), "admin");}
 
             include './inc/barra-menu.php'; ?>
             <main id="noticias"> 
@@ -253,7 +256,7 @@
                                 
                                 //.... obtener valores de post
                                 $nombre = $_POST["nombre"] ?? "Sin Categoria";
-                                if(saveCategoria(conectarBD(), ["nombre" => $nombre], $id)) {
+                                if($categoriasRepo->save(["nombre" => $nombre], $id)) {
                                     header("Location: index.php?p=categorias");
                                    
                                 }
@@ -269,7 +272,7 @@
                     <?php 
                             
                             if(!array_key_exists("btnNoticias", $_POST)) {
-                                $categorias = getAllCategorias(conectarBD(), []);//Para el selector
+                                $categorias = $categoriasRepo->getAllCategorias([]);//Para el selector
                                 include 'pages/noticias.php';
                                 
                             } else{
@@ -283,7 +286,7 @@
                                                 "contenido" => $contenido, 
                                                 "idCategoria" => $categoria, 
                                                 "autor" => strval(getUsername())];
-                                if(saveNoticia(conectarBD(), $valores, $id)) {
+                                if($noticiasRepo->save($valores, $id)) {
                                     header("Location: index.php?p=noticias");
                                     
                                 }

@@ -6,19 +6,26 @@ if($modoEdicion) { ?>
         <label for="titulo">Título: </label>
         <input type="text" id="titulo" name="titulo" value="<?=$noticia["titulo"] ?? ""?>">
     </p>
-
+    <!--Corregido: que en modo edición devuelva la cadena contenido y la categoria seleccionada-->
     <p>
     <label for="categorias">Categoria: </label>
         <select id="categoria" name="cat">
-            <?php foreach($categorias as $cat) { ?>
-                <option value="<?=$cat["id"] ?? 0 ?>" > <?=$cat["nombre"] ?> </option>
-            <?php } ?>
+            <?php foreach($categorias as $cat) { 
+                if ($noticia["idCategoria"]==$cat["id"]){ ?>
+                    <!--Ya devuelve la categoría seleccionadas-->
+                    <option value="<?=$cat["id"] ?? 0 ?>" selected> <?=$cat["nombre"] ?> </option> <?php
+                }else{ ?>
+                
+                    <option value="<?=$cat["id"] ?? 0 ?>" > <?= $cat["nombre"] ?> </option> <?php 
+                } 
+            } ?>
         </select>
     </p>
-
+    
     <p>
         <label for="contenido">Contenido: </label>
-        <textarea type="text" id="contenido" name="contenido" value="<?=$noticia["contenido"] ?? ""?>"></textarea>
+        <!--Ya devuelve el contenido-->
+        <textarea type="text" id="contenido" name="contenido" value="<?=$noticia["contenido"] ?? ""?>"> <?=$noticia["contenido"]?> </textarea>
     </p>
 
     <p class="btnGuardar">
