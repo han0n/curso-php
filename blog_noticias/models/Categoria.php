@@ -17,8 +17,8 @@ class Categoria {
         return $this->id;
     }
 
-    public function getCamposToBBDD():array {
-        return ["id"=>$this->id,"nombre"=>$this->nombre];
+    public function getToBD():array {
+        return ["nombre"=>$this->nombre];
     }
 
     public function getNombre():string {

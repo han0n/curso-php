@@ -256,7 +256,8 @@
                                 
                                 //.... obtener valores de post
                                 $nombre = $_POST["nombre"] ?? "Sin Categoria";
-                                if($categoriasRepo->save(["nombre" => $nombre], $id)) {
+                                $categoriaNueva = new Categoria(0, $nombre);
+                                if($categoriasRepo->save($categoriaNueva->getToBD(), $id)) {
                                     header("Location: index.php?p=categorias");
                                    
                                 }
@@ -281,12 +282,18 @@
                                 $titulo = $_POST["titulo"] ?? "Sin Título";
                                 $contenido = $_POST["contenido"] ?? "Sin Contenido";
                                 $categoria = $_POST["cat"] ?? "Sin Categoría";
+                                //$catId = $categoriasRepo->getIdByName($catNombre);
                                 // Se almacenan en un array como clave => valor para su tratamiento en el save
+                                /*
                                 $valores = ["titulo" => $titulo, 
                                                 "contenido" => $contenido, 
                                                 "idCategoria" => $categoria, 
                                                 "autor" => strval(getUsername())];
-                                if($noticiasRepo->save($valores, $id)) {
+                                */
+                                //Se almacena como objeto
+                                $noticiaNueva= new Noticia(0, $titulo, $contenido, strval(getUsername()), 0000000000, $categoria );
+                                //Se pasan los campos del objeto como array de claves => valores
+                                if($noticiasRepo->save($noticiaNueva->getToBD(), $id)) {
                                     header("Location: index.php?p=noticias");
                                     
                                 }

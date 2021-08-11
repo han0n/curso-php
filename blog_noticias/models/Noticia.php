@@ -16,25 +16,21 @@ class Noticia {
         $this->setContenido($contenido);
         $this->setAutor($autor);
         $this->setFechaPublicacion($fechaPublicacion);
-        $this->setCategoria($categoria);
+        $this->setCategoriaId($categoria);
     }
 
-    public function getCamposToBBDD():array {
+    public function getToBD():array {
         $campos = [
-            "id"=> $this->id,
             "titulo"=>$this->titulo, 
             "contenido"=>$this->contenido,
             "autor"=>$this->autor,
-            "fechaPublicacion" => $this->fechaPublicacion,
-            "idCategoria" => $this->getCategoria()->getId()
+            "idCategoria" => $this->categoria
         ];
 
         return $campos;
     }
 
-    public function setId(int $id) {
-        $this->id = $id;
-    }
+    
     public function getId():int {
         return $this->id;
     }
@@ -48,27 +44,31 @@ class Noticia {
     public function getAutor():string {
         return $this->autor;
     }
-    public function getFechaPublicacion() {
+    public function getFechaPublicacion(): int {
         return $this->fechaPublicacion;
     }
-    public function getCategoria():Categoria {
+    public function getCategoriaId():int {
         return $this->categoria;
     }
 
+    public function setId(int $id) {
+        $this->titulo = $id;
+    }
     public function setTitulo(string $titulo) {
         $this->titulo = $titulo;
     }
     public function setContenido(string $contenido) {
         $this->contenido = $contenido;
     }
+    public function setFechaPublicacion(?int $fechaPublicacion) {
+        $this->fechaPublicacion = $fechaPublicacion;
+    }
     public function setAutor(string $autor) {
         $this->autor = $autor;
     }
-    public function setFechaPublicacion($fechaPublicacion) {
-        $this->fechaPublicacion = $fechaPublicacion;
-    }
-    public function setCategoria(?Categoria $categoria) {
-        $this->categoria = $categoria ?? new Categoria();
+    
+    public function setCategoriaId($categoria) {
+        $this->categoria = $categoria;
     }
 
     public function __string(){
